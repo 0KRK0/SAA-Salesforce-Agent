@@ -1,0 +1,986 @@
+<title>One Agent, Thirty-Eight Tools</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+  /* ---- Light palette: complete, on bare :root ---------------------------- */
+  :root {
+    --ground:      #F2F4F3;   /* cool paper, faint green-grey bias */
+    --surface:     #FFFFFF;
+    --surface-sunk:#E7EBE9;
+    --ink:         #0E1416;   /* near-black, teal bias */
+    --ink-soft:    #46555A;
+    --ink-faint:   #77878C;
+    --rule:        #D2DAD7;
+    --rule-strong: #B4C0BC;
+
+    --accent:      #0B6156;   /* oxidised blue-green */
+    --accent-soft: #DCEAE6;
+    --accent-ink:  #084A42;
+
+    --gate:        #8A4B10;   /* the colour of "stop and check" */
+    --gate-soft:   #F6E8D8;
+    --danger:      #A3231C;
+    --danger-soft: #F7E1DF;
+    --muted-line:  #9AA8A4;
+
+    --measure: 68ch;
+    --step--1: 0.86rem;
+    --step-0:  1.0rem;
+    --step-1:  1.22rem;
+    --step-2:  1.6rem;
+    --step-3:  2.1rem;
+    --step-4:  2.9rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #0B1113;
+      --surface:     #131B1D;
+      --surface-sunk:#0A0F11;
+      --ink:         #E6ECEA;
+      --ink-soft:    #A3B2B0;
+      --ink-faint:   #74857F;
+      --rule:        #263133;
+      --rule-strong: #3A4749;
+
+      --accent:      #4FC3AE;
+      --accent-soft: #12312D;
+      --accent-ink:  #8AD9C8;
+
+      --gate:        #D69A5C;
+      --gate-soft:   #33220F;
+      --danger:      #E88079;
+      --danger-soft: #331714;
+      --muted-line:  #55686A;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #0B1113;
+    --surface:     #131B1D;
+    --surface-sunk:#0A0F11;
+    --ink:         #E6ECEA;
+    --ink-soft:    #A3B2B0;
+    --ink-faint:   #74857F;
+    --rule:        #263133;
+    --rule-strong: #3A4749;
+
+    --accent:      #4FC3AE;
+    --accent-soft: #12312D;
+    --accent-ink:  #8AD9C8;
+
+    --gate:        #D69A5C;
+    --gate-soft:   #33220F;
+    --danger:      #E88079;
+    --danger-soft: #331714;
+    --muted-line:  #55686A;
+  }
+
+  /* ---- Base -------------------------------------------------------------- */
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--step-0);
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 5vw, 4.5rem) clamp(1.1rem, 4vw, 2.5rem) 6rem;
+  }
+
+  .prose { max-width: var(--measure); }
+
+  h1, h2, h3 {
+    font-family: Archivo, ui-sans-serif, system-ui, sans-serif;
+    text-wrap: balance;
+    letter-spacing: -0.018em;
+    margin: 0;
+  }
+
+  h1 { font-size: var(--step-4); font-weight: 700; line-height: 1.04; }
+  h2 { font-size: var(--step-2); font-weight: 600; line-height: 1.18; }
+  h3 { font-size: var(--step-1); font-weight: 600; line-height: 1.3; }
+
+  p { margin: 0; }
+  strong { font-weight: 600; }
+
+  code, .mono {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.87em;
+  }
+
+  code {
+    background: var(--surface-sunk);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 0.08em 0.34em;
+  }
+
+  a { color: var(--accent); text-underline-offset: 0.16em; }
+  a:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* ---- Structure --------------------------------------------------------- */
+  header.masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    padding-bottom: 2.2rem;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .kicker {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: var(--step--1);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .standfirst {
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 46ch;
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    padding-top: 3.4rem;
+  }
+
+  .sec-label {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: var(--step--1);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .sec-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  /* ---- Answer cards ------------------------------------------------------ */
+  .answers {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  }
+
+  .answer {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--accent);
+    border-radius: 2px;
+    padding: 1.15rem 1.2rem 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .answer .q {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+  }
+
+  .answer .a {
+    font-family: Archivo, sans-serif;
+    font-size: var(--step-1);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+
+  .answer p { font-size: 0.94rem; color: var(--ink-soft); }
+
+  /* ---- Figures ----------------------------------------------------------- */
+  figure {
+    margin: 0.6rem 0 0;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 1.5rem 1.2rem 1.1rem;
+  }
+
+  .scroll { overflow-x: auto; }
+
+  figure svg {
+    display: block;
+    width: 100%;
+    min-width: 640px;
+    max-width: 100%;
+    height: auto;
+    color: var(--ink-soft);
+  }
+
+  figcaption {
+    margin-top: 1.1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    max-width: 74ch;
+  }
+
+  .svg-box   { fill: var(--surface); stroke: var(--rule-strong); }
+  .svg-sunk  { fill: var(--surface-sunk); stroke: var(--rule); }
+  .svg-accent{ fill: var(--accent-soft); stroke: var(--accent); }
+  .svg-gate  { fill: var(--gate-soft); stroke: var(--gate); }
+  .svg-t     { fill: var(--ink); font-family: "Source Sans 3", sans-serif; font-size: 13px; }
+  .svg-t-sm  { fill: var(--ink-soft); font-family: "JetBrains Mono", monospace; font-size: 10.5px; }
+  .svg-t-hd  { fill: var(--ink); font-family: Archivo, sans-serif; font-size: 13px; font-weight: 600; }
+  .svg-t-acc { fill: var(--accent-ink); font-family: "JetBrains Mono", monospace; font-size: 10.5px; }
+  .svg-t-gate{ fill: var(--gate); font-family: "JetBrains Mono", monospace; font-size: 10.5px; }
+  .flow      { stroke: var(--ink-soft); stroke-width: 1.5; fill: none; }
+  .flow-live { stroke: var(--accent); stroke-width: 2.2; fill: none; }
+  .flow-dead { stroke: var(--muted-line); stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+  .flow-gate { stroke: var(--gate); stroke-width: 1.8; fill: none; }
+
+  /* ---- Table ------------------------------------------------------------- */
+  .table-shell {
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--surface);
+  }
+
+  table { border-collapse: collapse; width: 100%; min-width: 44rem; }
+
+  th, td {
+    text-align: left;
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    font-size: 0.94rem;
+  }
+
+  th {
+    font-family: "JetBrains Mono", monospace;
+    font-size: var(--step--1);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 500;
+    background: var(--surface-sunk);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  td.num {
+    font-family: "JetBrains Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-soft);
+  }
+
+  .sub { display: block; color: var(--ink-faint); font-size: 0.86rem; margin-top: 0.15rem; }
+
+  .pill {
+    display: inline-block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    padding: 0.14em 0.5em;
+    border-radius: 2px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+  }
+  .pill.read  { color: var(--ink-faint); }
+  .pill.gated { color: var(--gate); background: var(--gate-soft); }
+  .pill.high  { color: var(--danger); background: var(--danger-soft); }
+
+  /* ---- Callout ----------------------------------------------------------- */
+  .callout {
+    border-left: 3px solid var(--gate);
+    background: var(--gate-soft);
+    padding: 1rem 1.15rem;
+    border-radius: 0 2px 2px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .callout .lede {
+    font-family: Archivo, sans-serif;
+    font-weight: 600;
+    font-size: 1.02rem;
+  }
+  .callout p { color: var(--ink-soft); font-size: 0.96rem; }
+
+  .note {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 1rem 1.15rem;
+    border-radius: 0 2px 2px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .note .lede { font-family: Archivo, sans-serif; font-weight: 600; font-size: 1.02rem; }
+  .note p { color: var(--ink-soft); font-size: 0.96rem; }
+
+  ul.tight { margin: 0; padding-left: 1.15rem; display: flex; flex-direction: column; gap: 0.4rem; }
+  ul.tight li { color: var(--ink-soft); }
+  ul.tight li strong { color: var(--ink); }
+
+  footer.end {
+    margin-top: 4rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.9rem;
+    color: var(--ink-faint);
+    max-width: var(--measure);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    a { transition: color 120ms ease; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <span class="kicker">Architecture reference · August 2026</span>
+    <h1>One agent.<br>Thirty-eight tools.</h1>
+    <p class="standfirst">
+      What the Salesforce agent actually connects to, what it is allowed to do,
+      and why it is not a fleet of agents.
+    </p>
+  </header>
+
+  <!-- ================================================================== -->
+  <section>
+    <span class="sec-label">The three short answers</span>
+
+    <div class="answers">
+      <div class="answer">
+        <span class="q">Are we using MCP?</span>
+        <span class="a">No — not today.</span>
+        <p>
+          Zero MCP servers are configured. Every tool reaches Salesforce through
+          its own REST, Metadata, Tooling, Bulk and Analytics APIs. MCP support
+          exists as an optional extra a customer can switch on.
+        </p>
+      </div>
+
+      <div class="answer">
+        <span class="q">What do we get access to?</span>
+        <span class="a">The whole org — through one user.</span>
+        <p>
+          An OAuth token scoped to <code>api</code> and
+          <code>refresh_token</code>, acting as the Salesforce user who
+          connected. Their permissions are the ceiling.
+        </p>
+      </div>
+
+      <div class="answer">
+        <span class="q">How many agents?</span>
+        <span class="a">One.</span>
+        <p>
+          A single reasoning loop with thirty-eight tools, grouped into ten
+          capability areas. Those areas are tool families, not separate agents.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <section>
+    <span class="sec-label">How the agent reaches Salesforce</span>
+
+    <div class="prose">
+      <p>
+        There are two possible routes out of the runtime. Only one of them is
+        carrying traffic. Both, critically, pass through the same gate — which
+        is what stops MCP from becoming a way around the safety layer.
+      </p>
+    </div>
+
+    <figure>
+      <div class="scroll">
+        <svg viewBox="0 0 900 400" role="img"
+             aria-label="The agent runtime sends every tool call through a deterministic risk engine and approval gate. From there the native path reaches Salesforce directly through REST, Metadata, Tooling, Bulk and Analytics APIs. A second, currently empty MCP path runs through the same gate to external MCP servers.">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+            </marker>
+            <marker id="ar-acc" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)"/>
+            </marker>
+            <marker id="ar-dead" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--muted-line)"/>
+            </marker>
+          </defs>
+
+          <!-- Claude -->
+          <rect class="svg-box" x="14" y="150" width="118" height="60" rx="2"/>
+          <text class="svg-t-hd" x="73" y="176" text-anchor="middle">Claude</text>
+          <text class="svg-t-sm" x="73" y="194" text-anchor="middle">reasoning</text>
+
+          <line class="flow" x1="132" y1="180" x2="186" y2="180" marker-end="url(#ar)"/>
+
+          <!-- Runtime -->
+          <rect class="svg-box" x="186" y="138" width="128" height="84" rx="2"/>
+          <text class="svg-t-hd" x="250" y="166" text-anchor="middle">Agent runtime</text>
+          <text class="svg-t-sm" x="250" y="184" text-anchor="middle">38 tools,</text>
+          <text class="svg-t-sm" x="250" y="198" text-anchor="middle">one loop</text>
+
+          <line class="flow" x1="314" y1="180" x2="368" y2="180" marker-end="url(#ar)"/>
+
+          <!-- The gate -->
+          <rect class="svg-gate" x="368" y="120" width="132" height="120" rx="2"/>
+          <text class="svg-t-hd" x="434" y="148" text-anchor="middle">The gate</text>
+          <text class="svg-t-gate" x="434" y="170" text-anchor="middle">risk engine</text>
+          <text class="svg-t-gate" x="434" y="187" text-anchor="middle">approval</text>
+          <text class="svg-t-gate" x="434" y="204" text-anchor="middle">audit</text>
+          <text class="svg-t-gate" x="434" y="221" text-anchor="middle">verification</text>
+
+          <!-- Native branch -->
+          <path class="flow-live" d="M 500 158 L 548 158 L 548 92 L 604 92" marker-end="url(#ar-acc)"/>
+          <text class="svg-t-acc" x="556" y="82">native · live</text>
+
+          <rect class="svg-accent" x="604" y="46" width="164" height="94" rx="2"/>
+          <text class="svg-t-hd" x="686" y="70" text-anchor="middle">Salesforce APIs</text>
+          <text class="svg-t-sm" x="686" y="90" text-anchor="middle">REST · SOQL · Tooling</text>
+          <text class="svg-t-sm" x="686" y="106" text-anchor="middle">Metadata · Bulk 2.0</text>
+          <text class="svg-t-sm" x="686" y="122" text-anchor="middle">Analytics</text>
+
+          <line class="flow-live" x1="768" y1="93" x2="826" y2="93" marker-end="url(#ar-acc)"/>
+
+          <rect class="svg-box" x="826" y="58" width="62" height="70" rx="2"/>
+          <text class="svg-t-hd" x="857" y="88" text-anchor="middle">Your</text>
+          <text class="svg-t-hd" x="857" y="105" text-anchor="middle">org</text>
+
+          <!-- MCP branch -->
+          <path class="flow-dead" d="M 500 202 L 548 202 L 548 300 L 604 300" marker-end="url(#ar-dead)"/>
+          <text class="svg-t-sm" x="556" y="292">optional</text>
+
+          <rect class="svg-sunk" x="604" y="262" width="164" height="76" rx="2"/>
+          <text class="svg-t-hd" x="686" y="288" text-anchor="middle">MCP servers</text>
+          <text class="svg-t-sm" x="686" y="308" text-anchor="middle">per customer</text>
+          <text class="svg-t-sm" x="686" y="324" text-anchor="middle">0 configured</text>
+
+          <line class="flow-dead" x1="768" y1="300" x2="826" y2="300" marker-end="url(#ar-dead)"/>
+          <rect class="svg-sunk" x="826" y="272" width="62" height="56" rx="2"/>
+          <text class="svg-t-sm" x="857" y="298" text-anchor="middle">anything</text>
+          <text class="svg-t-sm" x="857" y="313" text-anchor="middle">they add</text>
+
+          <!-- annotation -->
+          <line class="flow-gate" x1="434" y1="240" x2="434" y2="366"/>
+          <text class="svg-t-gate" x="444" y="360">
+            neither route can skip this box
+          </text>
+        </svg>
+      </div>
+      <figcaption>
+        The native path is the product. The MCP path exists so a customer can
+        add capabilities we have not built — and it is deliberately wired
+        <em>behind</em> the gate, not beside it, so an MCP tool cannot execute
+        without the same risk classification, approval and audit a first-party
+        tool gets.
+      </figcaption>
+    </figure>
+
+    <div class="note">
+      <span class="lede">Why direct APIs rather than MCP</span>
+      <p>
+        MCP is a transport. It does not give you anything the Salesforce APIs
+        don't already expose, and it takes away the two things this product is
+        built on: deterministic control over exactly which call is made, and the
+        ability to verify a change by reading the org back. A tool that deploys
+        metadata and then re-retrieves it to confirm cannot be a passthrough.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <section>
+    <span class="sec-label">What the agent is actually allowed to do</span>
+
+    <div class="prose">
+      <p>
+        "Access to the whole org" is true but incomplete. There are five
+        independent ceilings between a person typing a sentence and a record
+        changing, and the <strong>narrowest one wins</strong>. This is the part
+        worth being able to explain in a security review.
+      </p>
+    </div>
+
+    <figure>
+      <div class="scroll">
+        <svg viewBox="0 0 900 330" role="img"
+             aria-label="Five sequential ceilings constrain every action: the person's tenant role, the organization's agent policy, the deterministic risk engine, the human approval gate, and finally the Salesforce permissions of the connected user. The narrowest ceiling wins.">
+          <defs>
+            <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+
+          <text class="svg-t-sm" x="8" y="26">CEILING 1</text>
+          <text class="svg-t-sm" x="188" y="26">CEILING 2</text>
+          <text class="svg-t-sm" x="368" y="26">CEILING 3</text>
+          <text class="svg-t-sm" x="548" y="26">CEILING 4</text>
+          <text class="svg-t-sm" x="728" y="26">CEILING 5</text>
+
+          <!-- 1 -->
+          <rect class="svg-box" x="8" y="42" width="156" height="96" rx="2"/>
+          <text class="svg-t-hd" x="86" y="70" text-anchor="middle">Their role</text>
+          <text class="svg-t-sm" x="86" y="92" text-anchor="middle">viewer · analyst</text>
+          <text class="svg-t-sm" x="86" y="107" text-anchor="middle">developer · admin</text>
+          <text class="svg-t-sm" x="86" y="122" text-anchor="middle">owner · security</text>
+
+          <line class="flow" x1="164" y1="90" x2="182" y2="90" marker-end="url(#ar2)"/>
+
+          <!-- 2 -->
+          <rect class="svg-box" x="188" y="42" width="156" height="96" rx="2"/>
+          <text class="svg-t-hd" x="266" y="70" text-anchor="middle">Tenant policy</text>
+          <text class="svg-t-sm" x="266" y="92" text-anchor="middle">disabled tools</text>
+          <text class="svg-t-sm" x="266" y="107" text-anchor="middle">bulk ceiling</text>
+          <text class="svg-t-sm" x="266" y="122" text-anchor="middle">prod allowed?</text>
+
+          <line class="flow" x1="344" y1="90" x2="362" y2="90" marker-end="url(#ar2)"/>
+
+          <!-- 3 -->
+          <rect class="svg-gate" x="368" y="42" width="156" height="96" rx="2"/>
+          <text class="svg-t-hd" x="446" y="70" text-anchor="middle">Risk engine</text>
+          <text class="svg-t-gate" x="446" y="92" text-anchor="middle">deterministic</text>
+          <text class="svg-t-gate" x="446" y="107" text-anchor="middle">raises, never</text>
+          <text class="svg-t-gate" x="446" y="122" text-anchor="middle">lowers</text>
+
+          <line class="flow" x1="524" y1="90" x2="542" y2="90" marker-end="url(#ar2)"/>
+
+          <!-- 4 -->
+          <rect class="svg-gate" x="548" y="42" width="156" height="96" rx="2"/>
+          <text class="svg-t-hd" x="626" y="70" text-anchor="middle">A human</text>
+          <text class="svg-t-gate" x="626" y="92" text-anchor="middle">bound to the</text>
+          <text class="svg-t-gate" x="626" y="107" text-anchor="middle">exact change,</text>
+          <text class="svg-t-gate" x="626" y="122" text-anchor="middle">and to a clock</text>
+
+          <line class="flow" x1="704" y1="90" x2="722" y2="90" marker-end="url(#ar2)"/>
+
+          <!-- 5 -->
+          <rect class="svg-accent" x="728" y="42" width="160" height="96" rx="2"/>
+          <text class="svg-t-hd" x="808" y="70" text-anchor="middle">Salesforce itself</text>
+          <text class="svg-t-acc" x="808" y="92" text-anchor="middle">the connected</text>
+          <text class="svg-t-acc" x="808" y="107" text-anchor="middle">user's profile,</text>
+          <text class="svg-t-acc" x="808" y="122" text-anchor="middle">FLS and sharing</text>
+
+          <!-- brace + note -->
+          <path class="flow" d="M 8 160 L 8 172 L 888 172 L 888 160" stroke-width="1"/>
+          <text class="svg-t-sm" x="448" y="192" text-anchor="middle">
+            the narrowest ceiling wins — each is enforced independently
+          </text>
+
+          <!-- ownership row -->
+          <rect class="svg-sunk" x="8" y="216" width="516" height="86" rx="2"/>
+          <text class="svg-t-hd" x="24" y="242">Ours to enforce</text>
+          <text class="svg-t-sm" x="24" y="264">Roles, policy, risk classification and approval are code in this</text>
+          <text class="svg-t-sm" x="24" y="280">product. The model cannot reach any of them.</text>
+
+          <rect class="svg-sunk" x="548" y="216" width="340" height="86" rx="2"/>
+          <text class="svg-t-hd" x="564" y="242">Salesforce's to enforce</text>
+          <text class="svg-t-sm" x="564" y="264">If the connected user cannot delete</text>
+          <text class="svg-t-sm" x="564" y="280">Accounts, neither can the agent.</text>
+        </svg>
+      </div>
+      <figcaption>
+        The last ceiling is the one customers trust most, because it is not
+        ours: the agent inherits the connected Salesforce user's permissions,
+        field-level security and sharing rules. Connect a restricted user and
+        the agent is restricted, whatever the rest of the stack allows.
+      </figcaption>
+    </figure>
+
+    <div class="callout">
+      <span class="lede">The honest caveat for your sales conversations</span>
+      <p>
+        Metadata work — creating fields, deploying Flows, shipping Apex —
+        requires <strong>Modify All Data</strong> or <strong>Customize
+        Application</strong> on the connected user. There is no way around that;
+        it is what those APIs demand. So in practice a customer who wants the
+        engineering capabilities is connecting an admin-grade user, and the four
+        ceilings you control become the ones that actually matter.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <section>
+    <span class="sec-label">"How many agents" — the real answer</span>
+
+    <div class="prose">
+      <p>
+        One. There is a single runtime, a single Claude loop, a single approval
+        queue and a single audit trail. What the roadmap calls the "Flow agent"
+        or the "data quality agent" are <strong>tool families</strong> — a group
+        of tools plus the services behind them. They do not have their own
+        reasoning loops and do not call each other.
+      </p>
+      <p style="margin-top:0.8rem">
+        This is worth saying plainly, because it is a strength that is easy to
+        describe as a weakness. Ten capability areas behind one gate is one
+        place to audit and one place to fail. Ten autonomous agents would be ten.
+      </p>
+    </div>
+
+    <div class="table-shell">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Capability area</th>
+            <th scope="col">Tools</th>
+            <th scope="col">What it does</th>
+            <th scope="col">Highest gate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Schema &amp; data</strong><span class="sub">describe, query</span></td>
+            <td class="num">2</td>
+            <td>Reads object schema and runs validated, read-only SOQL with a mandatory row cap.</td>
+            <td><span class="pill read">open</span></td>
+          </tr>
+          <tr>
+            <td><strong>Records</strong><span class="sub">create, update</span></td>
+            <td class="num">2</td>
+            <td>Single-record writes, checked against required fields, verified by reading the record back.</td>
+            <td><span class="pill gated">approval</span></td>
+          </tr>
+          <tr>
+            <td><strong>Metadata</strong><span class="sub">fields, raw deploys</span></td>
+            <td class="num">2</td>
+            <td>Custom fields via the Metadata API. Refuses duplicates; confirms by re-describing the object.</td>
+            <td><span class="pill gated">approval</span></td>
+          </tr>
+          <tr>
+            <td><strong>Flow</strong><span class="sub">the automation builder</span></td>
+            <td class="num">7</td>
+            <td>Reads existing flows and their real logic, then authors record-triggered flows — every field checked against the org, every value typed from its Salesforce type.</td>
+            <td><span class="pill high">approval + prod block</span></td>
+          </tr>
+          <tr>
+            <td><strong>Apex</strong><span class="sub">the engineer</span></td>
+            <td class="num">5</td>
+            <td>Compiles against the org, writes code with its tests, deploys, then reports the actual test outcome. Refuses untested code and unsafe patterns.</td>
+            <td><span class="pill high">approval + prod block</span></td>
+          </tr>
+          <tr>
+            <td><strong>Data quality</strong><span class="sub">duplicates, bulk</span></td>
+            <td class="num">4</td>
+            <td>Analyses whole datasets server-side and returns findings. Bulk changes count the blast radius first and run through the Bulk API.</td>
+            <td><span class="pill high">approval + row cap</span></td>
+          </tr>
+          <tr>
+            <td><strong>Diagnostics</strong><span class="sub">the debugger</span></td>
+            <td class="num">1</td>
+            <td>Collects evidence across schema, flows, triggers, validation, permissions and history — then diagnoses, citing what it saw.</td>
+            <td><span class="pill read">open</span></td>
+          </tr>
+          <tr>
+            <td><strong>Dependencies</strong><span class="sub">impact analysis</span></td>
+            <td class="num">1</td>
+            <td>Answers "what breaks if I delete this" by two independent methods, and says which found what.</td>
+            <td><span class="pill read">open</span></td>
+          </tr>
+          <tr>
+            <td><strong>Reports</strong><span class="sub">and dashboards</span></td>
+            <td class="num">5</td>
+            <td>Lists and inspects reports, builds tabular and summary ones. Dashboards are read-only.</td>
+            <td><span class="pill gated">approval</span></td>
+          </tr>
+          <tr>
+            <td><strong>Security</strong><span class="sub">the auditor</span></td>
+            <td class="num">3</td>
+            <td>Resolves effective access as the union of every grant, ranks org-wide risk, and assigns permission sets one at a time.</td>
+            <td><span class="pill high">two approvers</span></td>
+          </tr>
+          <tr>
+            <td><strong>Releases</strong><span class="sub">change sets</span></td>
+            <td class="num">4</td>
+            <td>Bundles a change, diffs it against the live org, validates with tests, deploys, verifies by retrieving it back, and can roll it back.</td>
+            <td><span class="pill high">two approvers</span></td>
+          </tr>
+          <tr>
+            <td><strong>Org knowledge</strong><span class="sub">memory</span></td>
+            <td class="num">2</td>
+            <td>Recalls what earlier work found about this org, under a strict context budget. Refuses to store the agent's own conclusions.</td>
+            <td><span class="pill read">open</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <section>
+    <span class="sec-label">What happens when someone types a sentence</span>
+
+    <figure>
+      <div class="scroll">
+        <svg viewBox="0 0 900 372" role="img"
+             aria-label="A request moves through eight steps: understand, inspect the org, plan, classify risk, then either execute directly or pause for human approval, then verify against the org and report. An approval that has expired, been altered, or whose org state has drifted is rejected and nothing executes.">
+          <defs>
+            <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+            </marker>
+            <marker id="ar3-g" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--gate)"/>
+            </marker>
+            <marker id="ar3-a" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)"/>
+            </marker>
+          </defs>
+
+          <!-- top row -->
+          <rect class="svg-box" x="8" y="56" width="120" height="58" rx="2"/>
+          <text class="svg-t-sm" x="20" y="74">1</text>
+          <text class="svg-t-hd" x="68" y="92" text-anchor="middle">Understand</text>
+
+          <line class="flow" x1="128" y1="85" x2="152" y2="85" marker-end="url(#ar3)"/>
+
+          <rect class="svg-box" x="152" y="56" width="120" height="58" rx="2"/>
+          <text class="svg-t-sm" x="164" y="74">2</text>
+          <text class="svg-t-hd" x="212" y="92" text-anchor="middle">Inspect the org</text>
+
+          <line class="flow" x1="272" y1="85" x2="296" y2="85" marker-end="url(#ar3)"/>
+
+          <rect class="svg-box" x="296" y="56" width="120" height="58" rx="2"/>
+          <text class="svg-t-sm" x="308" y="74">3</text>
+          <text class="svg-t-hd" x="356" y="92" text-anchor="middle">Plan</text>
+
+          <line class="flow" x1="416" y1="85" x2="440" y2="85" marker-end="url(#ar3)"/>
+
+          <rect class="svg-gate" x="440" y="56" width="132" height="58" rx="2"/>
+          <text class="svg-t-gate" x="452" y="74">4</text>
+          <text class="svg-t-hd" x="506" y="92" text-anchor="middle">Classify risk</text>
+
+          <!-- fork label -->
+          <text class="svg-t-sm" x="592" y="52">is it gated?</text>
+
+          <!-- no branch -->
+          <path class="flow-live" d="M 572 74 L 610 74 L 610 44 L 700 44" marker-end="url(#ar3-a)"/>
+          <text class="svg-t-acc" x="618" y="36">no</text>
+
+          <!-- yes branch -->
+          <path class="flow-gate" d="M 572 98 L 610 98 L 610 168 L 656 168" marker-end="url(#ar3-g)"/>
+          <text class="svg-t-gate" x="618" y="120">yes</text>
+
+          <!-- approval box -->
+          <rect class="svg-gate" x="656" y="132" width="232" height="74" rx="2"/>
+          <text class="svg-t-gate" x="668" y="150">5</text>
+          <text class="svg-t-hd" x="772" y="152" text-anchor="middle">A human decides</text>
+          <text class="svg-t-gate" x="772" y="172" text-anchor="middle">bound to these exact arguments,</text>
+          <text class="svg-t-gate" x="772" y="188" text-anchor="middle">this org state, and a clock</text>
+
+          <!-- re-check -->
+          <path class="flow-gate" d="M 772 206 L 772 236" marker-end="url(#ar3-g)"/>
+          <rect class="svg-box" x="620" y="236" width="268" height="52" rx="2"/>
+          <text class="svg-t-hd" x="754" y="258" text-anchor="middle">Re-checked before it runs</text>
+          <text class="svg-t-sm" x="754" y="276" text-anchor="middle">expired · altered · org moved → nothing executes</text>
+
+          <!-- execute -->
+          <rect class="svg-accent" x="700" y="18" width="188" height="52" rx="2"/>
+          <text class="svg-t-acc" x="712" y="36">6</text>
+          <text class="svg-t-hd" x="794" y="50" text-anchor="middle">Execute</text>
+
+          <!-- from re-check back to execute -->
+          <path class="flow-gate" d="M 620 262 L 596 262 L 596 44 L 700 44" marker-end="url(#ar3-g)"/>
+
+          <!-- verify -->
+          <path class="flow-live" d="M 794 70 L 794 92 L 380 92" stroke-dasharray="0" opacity="0"/>
+          <path class="flow-live" d="M 888 44 L 900 44" opacity="0"/>
+
+          <rect class="svg-accent" x="296" y="304" width="200" height="56" rx="2"/>
+          <text class="svg-t-acc" x="308" y="322">7</text>
+          <text class="svg-t-hd" x="396" y="326" text-anchor="middle">Verify in the org</text>
+          <text class="svg-t-acc" x="396" y="345" text-anchor="middle">read it back, or report failure</text>
+
+          <path class="flow-live" d="M 794 70 L 794 112 L 520 112 L 520 332 L 496 332" marker-end="url(#ar3-a)"/>
+
+          <line class="flow-live" x1="296" y1="332" x2="240" y2="332" marker-end="url(#ar3-a)"/>
+          <rect class="svg-box" x="88" y="304" width="152" height="56" rx="2"/>
+          <text class="svg-t-sm" x="100" y="322">8</text>
+          <text class="svg-t-hd" x="164" y="336" text-anchor="middle">Report</text>
+
+          <!-- audit rail -->
+          <line class="flow" x1="8" y1="222" x2="580" y2="222" stroke-width="1" stroke-dasharray="3 4"/>
+          <text class="svg-t-sm" x="8" y="240">every step above writes an audit row — tenant, user, tool, arguments, outcome</text>
+        </svg>
+      </div>
+      <figcaption>
+        Step 7 is the one that distinguishes this from a chatbot with API access.
+        A deployment reporting "Succeeded" is Salesforce describing its own job;
+        retrieving the component back is the org describing its contents. A tool
+        that cannot confirm the second reports failure regardless of the first.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ================================================================== -->
+  <section>
+    <span class="sec-label">Where MCP fits — and where it doesn't</span>
+
+    <div class="prose">
+      <p>
+        Salesforce made their own Hosted MCP Servers generally available in
+        April 2026, so this is a live question rather than a hypothetical. It is
+        worth knowing exactly what they do, because the answer is
+        <em>good news for your positioning</em>.
+      </p>
+    </div>
+
+    <div class="table-shell">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Salesforce Hosted MCP</th>
+            <th scope="col">This product</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Read records</strong></td>
+            <td>Yes — respects CRUD, FLS, sharing</td>
+            <td>Yes — plus Bulk extraction and server-side analysis</td>
+          </tr>
+          <tr>
+            <td><strong>Write records</strong></td>
+            <td>Yes</td>
+            <td>Yes — gated, verified, audited</td>
+          </tr>
+          <tr>
+            <td><strong>Run existing automation</strong></td>
+            <td>Yes — Flows, Apex actions, Named Queries</td>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <td><strong>Create a field</strong></td>
+            <td>No</td>
+            <td>Yes — Metadata API, verified</td>
+          </tr>
+          <tr>
+            <td><strong>Author a Flow</strong></td>
+            <td>No — it can invoke one, not build one</td>
+            <td>Yes — record-triggered, validated against the org</td>
+          </tr>
+          <tr>
+            <td><strong>Write and test Apex</strong></td>
+            <td>No — it can call existing Apex</td>
+            <td>Yes — compile, deploy, run tests, report coverage</td>
+          </tr>
+          <tr>
+            <td><strong>Impact analysis</strong></td>
+            <td>No</td>
+            <td>Yes — dependency graph plus source scan</td>
+          </tr>
+          <tr>
+            <td><strong>Release lifecycle</strong></td>
+            <td>No</td>
+            <td>Yes — diff, validate, approve, deploy, roll back</td>
+          </tr>
+          <tr>
+            <td><strong>Approval &amp; audit</strong></td>
+            <td>Platform permissions and audit trail</td>
+            <td>Change-bound approvals, multi-approver policy, full trail</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <span class="lede">The line worth remembering</span>
+      <p>
+        Salesforce's MCP servers let an AI <strong>operate</strong> an org.
+        They do not let it <strong>build</strong> one. Everything in the lower
+        half of that table — fields, Flows, Apex, dependencies, releases — is
+        the engineering layer, and it is the part a Salesforce team actually
+        pays a consultant for. That is the business you are in.
+      </p>
+    </div>
+
+    <div class="prose" style="margin-top:1.4rem">
+      <p>
+        Which means MCP is <strong>complementary, not competitive</strong>, and
+        the way it is already wired is the right way: a customer who wants their
+        agent to also reach Jira, or a Salesforce MCP server, or an internal
+        system, registers it — and it lands behind the same gate as everything
+        else. You are not choosing between MCP and direct APIs. You are choosing
+        direct APIs for the work you are accountable for, and MCP for the reach
+        you are not.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <section>
+    <span class="sec-label">If you are building a company on this</span>
+
+    <div class="prose">
+      <ul class="tight">
+        <li>
+          <strong>Say "one agent, thirty-eight tools."</strong> It is accurate,
+          and it survives a technical diligence conversation. "Twelve agents"
+          does not, and the moment someone opens the repo the claim costs you
+          more than it bought.
+        </li>
+        <li>
+          <strong>Lead with the gate, not the capability list.</strong> Every
+          competitor can claim to create a field. The differentiator is that a
+          human approved this exact change, the approval expired in an hour, and
+          the org was re-read to prove it landed.
+        </li>
+        <li>
+          <strong>The admin-credential requirement is your biggest objection.</strong>
+          Get ahead of it: sandbox-first, production mutations off by default,
+          two approvers for anything touching security. Those defaults are
+          already in the product — make them part of the pitch.
+        </li>
+        <li>
+          <strong>Watch Salesforce's MCP roadmap.</strong> Today it stops at
+          operating an org. If it ever reaches metadata authoring, the ground
+          shifts — and the thing that would still be yours is the safety and
+          release machinery, not the API access.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="end">
+    <p>
+      Reflects the repository at <code>D:\Salesforce AI Agent</code> as built —
+      38 registered tools, 261 passing tests. Salesforce Hosted MCP capabilities
+      per Salesforce's GA documentation, April 2026.
+    </p>
+  </footer>
+
+</div>

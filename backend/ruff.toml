@@ -1,0 +1,35 @@
+line-length = 100
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC", "S", "C4", "RUF"]
+ignore = ["S101", "B008", "RUF012", "S104", "ASYNC109"]
+
+[lint.per-file-ignores]
+"tests/*" = ["S", "E501"]
+# The Salesforce REST/Tooling APIs take SOQL as a query-string parameter and
+# offer no bind-variable mechanism, so every query is assembled as a string.
+# Values interpolated in these modules go through `soql_literal()` (escaping)
+# or are validated against live describe results before use; the SOQL the
+# *model* proposes is separately parsed and restricted in app/salesforce/soql.py.
+"app/salesforce/inspect.py" = ["S608"]
+"app/salesforce/apex.py" = ["S608"]
+"app/salesforce/client.py" = ["S608"]
+"app/salesforce/dependencies.py" = ["S608"]
+"app/tools/data_quality_tools.py" = ["S608"]
+"app/tools/permission_tools.py" = ["S608"]
+"app/tools/debug_tools.py" = ["S608"]
+"app/tools/report_tools.py" = ["S608"]
+"app/knowledge/*" = ["S608"]
+"app/diagnostics/*" = ["S608"]
+# `secret_backend` names *which* backend to use ("local", "aws-kms"); the value
+# is a selector, never key material. The key itself is ENCRYPTION_KEY or lives
+# in the KMS and never appears in this file.
+"app/config.py" = ["S105"]
+# Alembic writes these files; reformatting generated DDL to a line limit adds
+# churn to every migration and catches nothing.
+"migrations/versions/*.py" = ["E501"]
+# The provider table names OAuth *endpoints* and the *setting names* that hold
+# credentials — "jira_client_secret" is the attribute to read, not a secret.
+# The values live in the environment and never appear in this file.
+"app/integrations/oauth.py" = ["S106"]

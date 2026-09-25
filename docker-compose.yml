@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sfagent
+      POSTGRES_PASSWORD: sfagent
+      POSTGRES_DB: sfagent
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sfagent"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    env_file:
+      # Optional so a fresh clone starts. Compose hard-errors on a missing
+      # env_file by default, which would make `docker compose up` fail before
+      # anyone had a chance to read why. Without it the backend starts and
+      # /health reports exactly what is unconfigured.
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+asyncpg://sfagent:sfagent@db:5432/sfagent
+      CORS_ORIGINS: http://localhost:3000
+      # One replica here, so migrating on start is safe and means `up` works
+      # with no second step. Set false and run `alembic upgrade head` as a
+      # pre-deploy job wherever several replicas start at once.
+      RUN_MIGRATIONS_ON_START: "true"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_BASE: http://localhost:8000
+    environment:
+      NEXT_PUBLIC_API_BASE: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

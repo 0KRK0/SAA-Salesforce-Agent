@@ -1,0 +1,25 @@
+# node_modules is the important line here.
+#
+# The Dockerfile installs dependencies in a `deps` stage and then runs
+# `COPY . .`. Without this file, a `node_modules` directory from the developer's
+# own machine is copied *over* the freshly installed one — and Next.js ships
+# platform-specific native binaries (SWC, and esbuild via its toolchain). A
+# Windows or macOS `node_modules` landing in a linux/alpine image produces a
+# build failure with an error that points nowhere near the cause.
+node_modules/
+
+# A stale local build directory would be copied in and then partially
+# overwritten, which is worse than either state on its own.
+.next/
+out/
+
+.env
+.env.*
+!.env.example
+
+npm-debug.log*
+yarn-error.log*
+.DS_Store
+
+.git/
+.gitignore

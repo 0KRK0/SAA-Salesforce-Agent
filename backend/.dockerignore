@@ -1,0 +1,30 @@
+# What must never enter an image layer.
+#
+# `.env` is first for a reason: a COPY of the build context bakes it into a
+# layer, and an image layer is not a secret store. Anyone who can pull the
+# image can read it, and deleting it in a later layer does not remove it.
+.env
+.env.*
+!.env.example
+
+# Local database files. Shipping one means the image starts with somebody
+# else's data — and, in development, somebody else's connected orgs.
+*.db
+*.sqlite
+*.sqlite3
+
+# Build and test residue. None of it is used at runtime and all of it is
+# host-specific.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+*.egg-info/
+.venv/
+venv/
+
+.git/
+.gitignore
