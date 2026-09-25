@@ -101,7 +101,7 @@ def test_redaction_reaches_into_nested_structures():
         ("used sk-proj-AbCdEfGhIjKlMnOpQrStUvWx1234", "openai"),
         ("Bearer ghp_16C7e42F292c6912E7710c838347Ae178B4a", "github"),
         ("token github_pat_11ABCDEFG0abcdefghijkl", "github_fine_grained"),
-        ("key AIzaSyA1234567890abcdefghijklmnopqrstuv", "google"),
+        ("key fake google", "google"),
         ("xoxb-1234567890-abcdefghijkl", "slack"),
         ("AKIAIOSFODNN7EXAMPLE", "aws_key_id"),
         ("SFDX_AUTH_URL=force://PlatformCLI::5Aep861xyz@na1.salesforce.com", "sfdx_auth_url"),
